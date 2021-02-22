@@ -54,9 +54,11 @@ class _AuthScreenState extends State<AuthScreen> {
               .doc(userCredential.user.uid)
               .set({'username': username, 'email': email, 'image_url': url});
 
-          setState(() {
-            _isLoading = false;
-          });
+          if (mounted) {
+            setState(() {
+              _isLoading = false;
+            });
+          }
         });
       }
     } on FirebaseAuthException catch (err) {
