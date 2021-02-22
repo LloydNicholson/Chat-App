@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_twizza_connect_test/widgets/pickers/user_image_picker.dart';
 
 class AuthForm extends StatefulWidget {
   AuthForm(
@@ -50,6 +51,7 @@ class _AuthFormState extends State<AuthForm> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
+                  UserImagePicker(),
                   TextFormField(
                     key: ValueKey("email"),
                     validator: (value) {
