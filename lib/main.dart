@@ -4,6 +4,7 @@ import 'package:flutter_twizza_connect_test/screens/auth_screen.dart';
 import 'package:flutter_twizza_connect_test/screens/chat_screen.dart';
 // Import the firebase_core plugin
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_twizza_connect_test/screens/splash_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,6 +46,10 @@ class MyApp extends StatelessWidget {
             home: StreamBuilder(
               stream: FirebaseAuth.instance.authStateChanges(),
               builder: (ctx, userSnapShot) {
+                if (userSnapShot.connectionState == ConnectionState.waiting) {
+                  return SplashScreen();
+                }
+
                 if (userSnapShot.hasData) {
                   return ChatScreen();
                 } else {
