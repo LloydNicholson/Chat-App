@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_twizza_connect_test/widgets/auth_form.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class AuthScreen extends StatefulWidget {
   @override
@@ -15,6 +18,7 @@ class _AuthScreenState extends State<AuthScreen> {
   void _submitAuthFrom(
     String email,
     String username,
+    File imageFile,
     String password,
     bool isLogin,
     BuildContext ctx,
@@ -35,10 +39,25 @@ class _AuthScreenState extends State<AuthScreen> {
           email: email,
           password: password,
         );
-        await FirebaseFirestore.instance
-            .collection("users")
-            .doc(userCredential.user.uid)
-            .set({'username': username, 'email': email});
+
+        final ref = FirebaseStorage.instance
+            .ref()
+            .child('user_images')
+            .child(userCredential.user.uid + '.jpg');
+
+        var uploadTask = ref.putFile(imageFile);
+        await uploadTask.whenComplete(() async {
+          final url = await ref.getDownloadURL();
+
+          await FirebaseFirestore.instance
+              .collection("users")
+              .doc(userCredential.user.uid)
+              .set({'username': username, 'email': email, 'image_url': url});
+
+          setState(() {
+            _isLoading = false;
+          });
+        });
       }
     } on FirebaseAuthException catch (err) {
       var message = "An error occurred, please check your connection";
@@ -52,9 +71,11 @@ class _AuthScreenState extends State<AuthScreen> {
           backgroundColor: Theme.of(ctx).errorColor,
         ),
       );
+      setState(() {
+        _isLoading = false;
+      });
     } catch (err) {
       print(err);
-    } finally {
       setState(() {
         _isLoading = false;
       });
